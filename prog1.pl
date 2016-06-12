@@ -36,4 +36,4 @@ calcula_casa(L,C,STR) :- C1 is C -1,calcula_casa(L,C1,STR).
 
 calcula_linha(0,STR) :- tamanho(T), T1 is T -1, calcula_casa(0,T1,STR).
 calcula_linha(L,STR) :- tamanho(T), T1 is T -1, calcula_casa(L,T1,STR), L1 is L - 1, calcula_linha(L1,STR).
-inicio :- open("ambient.pl",write,STR), tamanho(T),T1 is T - 1,calcula_linha(T1,STR).
+inicio :- open("ambiente.pl",write,STR), tamanho(T),T1 is T - 1,calcula_linha(T1,STR).
