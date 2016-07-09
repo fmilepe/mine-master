@@ -60,10 +60,22 @@ casa_menos_chance_bomba(_,_,_).
 
 :- init_vizinhos.
 
-/* Cláusula que seleciona as jogadas */
+/* 
+	Cláusula que seleciona as jogadas.
+
+	A chamada abaixo calcula a casa com menor probabilidade de ter uma bomba e joga nela, se a probabiliade de ela ter bomba for menor que 1. Chama a propria clausula recursivamente para a próxima jogada.
+
+*/
 joga :- nb_getval(finish,FIM), not(FIM),tamanho(T), T1 is T - 1, casa_menos_chance_bomba((T1,T1),(X,Y),P), P < 1, X > -1,posicao(X,Y),joga.
+
+/* Calcula a casa com menor probabilidade de ter bomba, mas recebe como resultado uma coordenada que indica que não tem nenhuma casa com essa probabilidade definida, então escolhe uma casa aleatória e joga nela. */
 joga :- nb_getval(finish,FIM),not(FIM),tamanho(T),T1 is T-1, casa_menos_chance_bomba((T1,T1),COORD,P),COORD=(-1,-1) , random_between(0,T1,X),random_between(0,T1,Y),posicao(X,Y),joga.
 
+/* 
+	Trata os casos em que a casa com probabilidade definida e menor probabilidade de ter bomba com certeza tem uma bomba. 
+	
+	Seleciona uma posição aleatória e joga nela, se ela não for uma posição já aberta ou uma posição com probabilidade 1 de ter bomba. Caso a posição escolhida já esteja aberta ou tenha probabilidade de ter bomba igual a 1, não abre a casa e chama a cláusula recursivamente, para que ela tente gerar outra posição melhor para jogar.
+*/
 joga :- nb_getval(finish,FIM),not(FIM),tamanho(T),T1 is T-1, casa_menos_chance_bomba((T1,T1),COORD,P),P=1, random_between(0,T1,X),random_between(0,T1,Y),prob_bomba_casa((X,Y),P), P < 1, not(v((X,Y),_)), posicao(X,Y),joga.
 joga :- nb_getval(finish,FIM),not(FIM),tamanho(T),T1 is T-1, casa_menos_chance_bomba((T1,T1),COORD,P),P=1, random_between(0,T1,X),random_between(0,T1,Y),prob_bomba_casa((X,Y),P), P < 1, v((X,Y),_), joga.
 joga :- nb_getval(finish,FIM),not(FIM),tamanho(T),T1 is T-1, casa_menos_chance_bomba((T1,T1),COORD,P),P=1, random_between(0,T1,X),random_between(0,T1,Y),prob_bomba_casa((X,Y),P), P = 1,joga.
