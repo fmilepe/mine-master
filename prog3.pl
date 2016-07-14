@@ -1,4 +1,7 @@
+/* Carregando cláusulas criadas no arquivo prog2.pl para serem usadas no decorrer do jogo. */
 :- ensure_loaded(prog2).
+
+/* Declarando que a cláusula vizinhos (que relaciona uma casa com as outras adjacentes a ela), será alterada dinamicamente com assert */
 :- dynamic vizinhos/2.
 
 /* Setando vizinhanca das casas que ficam nos vértices do tabuleiro */
@@ -27,7 +30,7 @@ init_vizinhos :- tamanho(T), T1 is T-1, init_vizinhanca(T1,T1).
 /* Busca todos os vizinhos de uma dada casa*/
 lista_vizinhos(COORD,L) :- findall(V,vizinhos(COORD,V),L1), L = L1.
 
-/* Recebe a lista de casas e retorna somente as que ainda não foram abertas */
+/* Recebe a lista de ccasas e retorna somente as que ainda não foram abertas */
 retira_vizinhos_abertos([], []).
 retira_vizinhos_abertos([ H | T ],[ H | R ]) :- not(v(H,_)),!,retira_vizinhos_abertos(T, R).
 retira_vizinhos_abertos([ _ | T ], R) :- retira_vizinhos_abertos(T, R).
@@ -43,14 +46,18 @@ prob_bomba_vizinho_list([V|L1],[P|L2]) :- prob_bomba_vizinho_list(L1,L2), prob_b
 /* Calcula a probabilidade de uma casa ter uma bomba. A probabilidade de uma casa ter uma bomba é a maior das probabilidades calculadas para seus vizinhos pela cláusula prob_bomba_vizinho_list */
 prob_bomba_casa(Casa,P) :- lista_vizinhos(Casa,L), retira_vizinhos_abertos(L,L1), diff(L,L1,L2),prob_bomba_vizinho_list(L2,R), max_list(R,P).
 
-/* Varrendo todas as casas e achando a casa fechada com menor probabilidade de ter bomba, segundo a heurísitca escolhida */
+/* Varrendo todas as casas e achando a casa fechada com menor probabilidade de ter bomba, segundo a heurística escolhida. 
+   A primeira chamada abaixo é usada como caso base da recursão, para que consigamos valorar a variável prob e usá-la conforme vamos retornando da recursão.
+*/
 casa_menos_chance_bomba((X,Y),(-1,-1),1.0) :- X < 0,!.
 
+/* Calcula a probabilida para casas que não estão na coluna zero, e portanto a próxima casa da recursão será na mesma linha e na coluna anterior. */
 casa_menos_chance_bomba((X,Y),(Z,W),PROB) :- Y > 0, v((X,Y),_),!, Y1 is Y - 1, casa_menos_chance_bomba((X,Y1),(V,S),P), Z is V, W is S, PROB is P.
 casa_menos_chance_bomba((X,Y),(Z,W),PROB) :- Y > 0, not(v((X,Y),_)), prob_bomba_casa((X,Y),P2),  Y1 is Y - 1, casa_menos_chance_bomba((X,Y1),(V,S),P), P2 > P,!, PROB is P, Z is V, W is S.
 casa_menos_chance_bomba((X,Y),(Z,W),PROB) :- Y > 0, not(v((X,Y),_)), Y1 is Y - 1, casa_menos_chance_bomba((X,Y1),(V,S),P), prob_bomba_casa((X,Y),P2), P2 =< P, !,PROB is P2, Z is X, W is Y.
 casa_menos_chance_bomba((X,Y),(Z,W),PROB) :- Y > 0, not(v((X,Y),_)), not(prob_bomba_casa((X,Y),P2)),!, Y1 is Y - 1, casa_menos_chance_bomba((X,Y1),(V,S),P), PROB is P, Z is V, W is S.
 
+/* Calcula a probabilida para casas que estão na coluna 0. A próxima casa da recursão será na linha anterior e na última coluna. */
 casa_menos_chance_bomba((X,Y),(Z,W),PROB) :- Y = 0, v((X,Y),_),!, X1 is X - 1, tamanho(T), T1 is T - 1, casa_menos_chance_bomba((X1,T1),(V,S),P), Z is V, W is S, PROB is P.
 casa_menos_chance_bomba((X,Y),(Z,W),PROB) :- Y = 0, not(v((X,Y),_)), X1 is X - 1, tamanho(T), T1 is T - 1, casa_menos_chance_bomba((X1,T1),(V,S),P), prob_bomba_casa((X,Y),P2), P2 > P,!, PROB is P, Z is V, W is S.
 casa_menos_chance_bomba((X,Y),(Z,W),PROB) :- Y = 0, not(v((X,Y),_)), X1 is X - 1, tamanho(T), T1 is T - 1, casa_menos_chance_bomba((X1,T1),(V,S),P), prob_bomba_casa((X,Y),P2), P2 =< P,!, PROB is P2, Z is X, W is Y.
@@ -58,6 +65,7 @@ casa_menos_chance_bomba((X,Y),(Z,W),PROB) :- Y = 0, not(v((X,Y),_)), not(prob_bo
 
 casa_menos_chance_bomba(_,_,_).
 
+/* Chamada que inicializa as relações de vizinhança */
 :- init_vizinhos.
 
 /* 
