@@ -1,6 +1,14 @@
+/* Carrega as cláusulas criadas no prog1.pl */
 :- ensure_loaded(prog1).
+
+/* Carrega as cláusulas auxiliares criadas no arquivo utils.pl */
 :- ensure_loaded(utils).
+
+/* Abre o arquivo onde será salvo o log do jogo atual e inicializa as constantes stream (stream do arquivo de log), 
+	count (contador que diz qual o numero da jogada atua) e finish (booleano que diz se o jogo já acabou) */
 :- open("jogo.pl",write,STR), nb_setval(stream, STR), nb_setval(count, 0),nb_setval(finish,false).
+
+/* Declarando que a cláusula v (que guarda os valores que já foram abertos), será alterada dinamicamente com assert */
 :- dynamic v/2.
 
 /* 
@@ -46,7 +54,8 @@ acabou(FIM):- nb_getval(finish,FIM).
 
 /* Testa se o jogador venceu com a ultima jogada. */
 testa_fim :- findall(X, v(X,_),L1), tamanho(T), len(L1,LGTH), nb_getval(nminas,MINAS), N is LGTH + MINAS, T2 is T*T, N=T2,!, nb_setval(finish,true),writeln('Parabéns, você venceu!'),nb_getval(stream,STR),close(STR).
-/* Garante que, se o jogador não venceu, a o testa_fim dê verdadeiro, sem alterar nada no ambiente. Isso foi feito porque o testa_fim estava dando falso e fazendo com que toda a cláusula posicao que o chamava desse falso */
+
+/* Garante que, se o jogador não venceu, o testa_fim dê verdadeiro, sem alterar nada no ambiente. Isso foi feito porque o testa_fim estava dando falso e fazendo com que toda a cláusula posicao que o chamava desse falso */
 testa_fim.
 
 
