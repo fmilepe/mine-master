@@ -1,8 +1,8 @@
 /* Carregando arquivo com a configuração das minas */
 :- ensure_loaded(mina).
 
-/* Calcula o número de minas na configuração atual do tabuleiro */
-:- findall(COORD,mina(COORD),MINAS), len(MINAS,NUMMINAS), nb_setval(nminas,NUMMINAS).
+/* Setando o número de minas no tabuleiro */
+:- nb_setval(nminas,4).
 
 /* Define o tamanho do tabuleiro */
 tamanho(4).
