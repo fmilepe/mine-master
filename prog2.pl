@@ -16,7 +16,7 @@
 
 	A regra abaixo garante que se o jogo já tiver sido encerrado o jogador não consiga abrir mais nenhuma posição do tabuleiro.
 */
-posicao(_,_) :- acabou(FIM), FIM, !, writeln('Jogo encerrado, de make para começar um novo jogo.').
+posicao(_,_) :- acabou(FIM), FIM, !, writeln('Jogo encerrado, reinicie o prolog para começar um novo jogo.').
 
 /* Evita que o jogador consiga abrir de novo uma posição já aberta */
 posicao(X,Y) :- v((X,Y),_), !, writeln('Posicao já aberta, escolha outra para jogar.').
